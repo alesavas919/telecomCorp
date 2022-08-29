@@ -16,7 +16,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
-import xyz.telecom.corp.net.security.entity.UsuarioPrincipal;
+import xyz.telecom.corp.net.security.entity.PrincipalUser;
 @Slf4j
 @Component
 public class JwtProvider {
@@ -29,8 +29,8 @@ public class JwtProvider {
     private int expiration;
 
     public String generateToken(Authentication authentication){
-        UsuarioPrincipal usuarioPrincipal = (UsuarioPrincipal) authentication.getPrincipal();
-        return Jwts.builder().setSubject(usuarioPrincipal.getUsername())
+        PrincipalUser principalUser = (PrincipalUser) authentication.getPrincipal();
+        return Jwts.builder().setSubject(principalUser.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expiration * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret)

@@ -6,17 +6,21 @@ package xyz.telecom.corp.net.security.dto;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import xyz.telecom.corp.net.security.entity.Rol;
+
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class JwtDto {
     private String token;
     private String bearer = "Bearer";
-    private String nombreUsuario;
+    private String userName;
     private Collection<? extends GrantedAuthority> authorities;
 
     public JwtDto(String token, String nombreUsuario, Collection<? extends GrantedAuthority> authorities) {
         this.token = token;
-        this.nombreUsuario = nombreUsuario;
+        this.userName = nombreUsuario;
         this.authorities = authorities;
     }
 
@@ -36,12 +40,12 @@ public class JwtDto {
         this.bearer = bearer;
     }
 
-    public String getNombreUsuario() {
-        return nombreUsuario;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setNombreUsuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {

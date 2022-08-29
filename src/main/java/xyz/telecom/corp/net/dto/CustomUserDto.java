@@ -1,4 +1,4 @@
-package xyz.telecom.corp.net.security.dto;
+package xyz.telecom.corp.net.dto;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,9 +6,10 @@ import java.util.Set;
 import lombok.Data;
 
 @Data
-public class newUser {
-    
-    private String name;
+public class CustomUserDto {
+    private Integer id;
+	
+	private String name;
     
     private String login;
     
@@ -24,14 +25,5 @@ public class newUser {
     
     private String password;
     private Set<String> roles = new HashSet();
-
     
-
-    public Set<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<String> roles) {
-        this.roles = roles;
-    }
 }

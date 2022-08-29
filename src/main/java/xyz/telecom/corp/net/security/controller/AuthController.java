@@ -19,10 +19,10 @@ import xyz.telecom.corp.net.security.dto.LoginUser;
 import xyz.telecom.corp.net.security.dto.newUser;
 import xyz.telecom.corp.net.security.entity.Rol;
 import xyz.telecom.corp.net.security.entity.Users;
-import xyz.telecom.corp.net.security.enums.RolNombre;
+import xyz.telecom.corp.net.security.enums.RolName;
 import xyz.telecom.corp.net.security.jwt.JwtProvider;
 import xyz.telecom.corp.net.security.service.RolService;
-import xyz.telecom.corp.net.security.service.UsuarioService;
+import xyz.telecom.corp.net.security.service.UserService;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +39,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UsuarioService usuarioService;
+    private UserService userService;
 
     @Autowired
     private RolService rolService;
@@ -53,34 +53,42 @@ public class AuthController {
     //END INIT
     
     
-    @PostMapping("/nuevo")
+    @PostMapping("/newUser")
     public ResponseEntity<?> nuevo(@RequestBody newUser newUser, BindingResult bindingResult){
-
-			
-		Rol rol = new Rol();
-		rol.setId(Short.parseShort("1"));
-		rol.setRolNombre(RolNombre.ROLE_ADMIN);
-		rolService.save(rol);
-		rol.setId(Short.parseShort("2"));
-		rol.setRolNombre(RolNombre.ROLE_USER);
-		rolService.save(rol);
-		
+    	Boolean rl = rolService.getByRolName(RolName.ADMIN).isEmpty();
+    	//System.out.println(rl);
+		if(rl) {
+			Rol rol = new Rol();
+			rol.setId(Short.parseShort("1"));
+			rol.setRolName(RolName.ADMIN);
+			rolService.save(rol);
+			rol.setId(Short.parseShort("2"));
+			rol.setRolName(RolName.USER);
+			rolService.save(rol);
+			rol.setId(Short.parseShort("3"));
+			rol.setRolName(RolName.VIEWER);
+			rolService.save(rol);
+		}    	
     	if(bindingResult.hasErrors())
             return new ResponseEntity("campos mal puestos o email inválido", HttpStatus.INTERNAL_SERVER_ERROR);
-        if(usuarioService.existsByNombreUsuario(newUser.getLogin()))
-            return new ResponseEntity("Ese nombre ya existe", HttpStatus.CONFLICT);
-        if(usuarioService.existsByEmail(newUser.getEmail()))
+        if(userService.existsByUserName(newUser.getLogin()))
+            return new ResponseEntity("Ese nombre ya existe", HttpStatus.BAD_REQUEST);
+        if(userService.existsByEmail(newUser.getEmail()))
             return new ResponseEntity("Ese email ya existe", HttpStatus.BAD_REQUEST);
+        if(userService.existsByCode(newUser.getCode()))
+            return new ResponseEntity("Ese codigo ya existe", HttpStatus.BAD_REQUEST);
         Users users =
-                new Users(newUser.getName(), newUser.getLogin(), newUser.getEmail(),newUser.getCode(),newUser.getPhoneNumber(),newUser.getAddress(),
+                new Users(newUser.getName(), newUser.getLogin(), newUser.getEmail(),newUser.getCode(),newUser.getAge(),newUser.getPhoneNumber(),newUser.getAddress(),
                         passwordEncoder.encode(newUser.getPassword()));
         Set<Rol> roles = new HashSet<>();
-        roles.add(rolService.getByRolNombre(RolNombre.ROLE_USER).get());
-        if(newUser.getRoles().contains("admin"))
-            roles.add(rolService.getByRolNombre(RolNombre.ROLE_ADMIN).get());
+        //roles.add(rolService.getByRolNombre(RolName.ADMIN).get());
+        if(newUser.getRoles().contains("admin"))roles.add(rolService.getByRolName(RolName.ADMIN).get());
+        if(newUser.getRoles().contains("user"))roles.add(rolService.getByRolName(RolName.USER).get());
+        if(newUser.getRoles().contains("viewer"))roles.add(rolService.getByRolName(RolName.VIEWER).get());
         users.setRoles(roles);
-        usuarioService.save(users);
-        return ResponseEntity.ok("usuario guardado");
+        
+        userService.save(users);
+        return ResponseEntity.ok("Usuario Guardado");
     }
 
     @PostMapping("/login")
@@ -90,7 +98,9 @@ public class AuthController {
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getLogin(), loginUser.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        
         String jwt = jwtProvider.generateToken(authentication);
+        
         UserDetails userDetails = (UserDetails)authentication.getPrincipal();
         JwtDto jwtDto = new JwtDto(jwt, userDetails.getUsername(), userDetails.getAuthorities());
         

@@ -2,6 +2,6 @@ package xyz.telecom.corp.net.security.enums;
 
 
 
-public enum RolNombre {
-    ROLE_ADMIN, ROLE_USER
+public enum RolName {
+    ADMIN,VIEWER,USER
 }

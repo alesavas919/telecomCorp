@@ -10,26 +10,26 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UsuarioPrincipal implements UserDetails {//details about user with token 
-    private String nombre;
-    private String nombreUsuario;
+public class PrincipalUser implements UserDetails {//details about user with token 
+    private String name;
+    private String userName;
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;//authentification
 
-    public UsuarioPrincipal(String nombre, String nombreUsuario, String email, String password, Collection<? extends GrantedAuthority> authorities) {
-        this.nombre = nombre;
-        this.nombreUsuario = nombreUsuario;
+    public PrincipalUser(String name, String userName, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+        this.name = name;
+        this.userName = userName;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
     }
 
-    public static UsuarioPrincipal build(Users users){//get authorities from rol usuario
+    public static PrincipalUser build(Users users){//get authorities from rol usuario
         List<GrantedAuthority> authorities =
                 users.getRoles().stream().map(rol -> new SimpleGrantedAuthority(rol
-                .getRolNombre().name())).collect(Collectors.toList());
-        return new UsuarioPrincipal(users.getName(), users.getLogin(), users.getEmail(), users.getPassword(), authorities);
+                .getRolName().name())).collect(Collectors.toList());
+        return new PrincipalUser(users.getName(), users.getLogin(), users.getEmail(), users.getPassword(), authorities);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class UsuarioPrincipal implements UserDetails {//details about user with 
 
     @Override
     public String getUsername() {
-        return nombreUsuario;
+        return userName;
     }
 
     @Override
@@ -67,8 +67,8 @@ public class UsuarioPrincipal implements UserDetails {//details about user with 
         return true;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
     public String getEmail() {

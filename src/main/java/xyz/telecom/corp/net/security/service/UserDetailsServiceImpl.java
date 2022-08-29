@@ -7,17 +7,17 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import xyz.telecom.corp.net.security.entity.Users;
-import xyz.telecom.corp.net.security.entity.UsuarioPrincipal;
+import xyz.telecom.corp.net.security.entity.PrincipalUser;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UsuarioService usuarioService;
+    private UserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String nombreUsuario) throws UsernameNotFoundException {
-        Users users = usuarioService.getByNombreUsuario(nombreUsuario).get();
-        return UsuarioPrincipal.build(users);
+        Users users = userService.getByUserName(nombreUsuario).get();
+        return PrincipalUser.build(users);
     }
 }

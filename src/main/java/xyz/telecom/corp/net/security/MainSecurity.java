@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import xyz.telecom.corp.net.restController.CustomAuthProvider;
 import xyz.telecom.corp.net.security.jwt.JwtEntryPoint;
 import xyz.telecom.corp.net.security.jwt.JwtTokenFilter;
 import xyz.telecom.corp.net.security.service.UserDetailsServiceImpl;
@@ -25,11 +26,14 @@ import xyz.telecom.corp.net.security.service.UserDetailsServiceImpl;
 public class MainSecurity extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    UserDetailsServiceImpl userDetailsService;
+    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
-    JwtEntryPoint jwtEntryPoint;
+    private JwtEntryPoint jwtEntryPoint;
 
+    //@Autowired
+    //private CustomAuthProvider customAuthProvider;
+    
     @Bean
     public JwtTokenFilter jwtTokenFilter(){
         return new JwtTokenFilter();
@@ -43,6 +47,7 @@ public class MainSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    	//auth.authenticationProvider(customAuthProvider);
     }
 
     @Bean
@@ -58,14 +63,40 @@ public class MainSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/auth/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        
+    	/*
+		http.cors().and().csrf().disable()
+		    .authorizeRequests()
+		    .antMatchers("/auth/**").permitAll()
+		    .antMatchers("/user/**").hasRole("ADMIN")
+		    .anyRequest().authenticated()
+		    .and()
+		    .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
+		    .and()
+		    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        
+		/*		
+         --NO USE
+         http.csrf().disable()
+        .authorizeRequests()
+        .antMatchers("/auth/login","/auth/newUser").permitAll()
+        .anyRequest().permitAll()
+        .and()
+        .httpBasic();
+         --COMPLETE
+        */ 
+         
+         http.cors().and().csrf().disable()
+        .authorizeRequests()
+        .antMatchers("/auth/**").permitAll()
+        .anyRequest().authenticated()
+        .and()
+        .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
+        .and()
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		
+
     }
 }
