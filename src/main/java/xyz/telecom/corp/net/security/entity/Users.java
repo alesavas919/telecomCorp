@@ -4,6 +4,9 @@ package xyz.telecom.corp.net.security.entity;
 
 import javax.persistence.*;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -17,6 +20,10 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
+//@NamedQuery(name = "Users.updateUser",query="UPDATE public.users SET address=:ads, code=cod, email=em, login=lin, name=n, password=pwd, phone_number=phnum, age=age WHERE id:ids")
+//; UPDATE user_role SET rol_id = :num	where usuario_id = :ids;
+//void update(@Param("ids")Integer id,@Param("ads")Integer cod,@Param("em")String email,@Param("lin")String login,@Param("n")String name,@Param("pwd")String password,@Param("phnum")String phoneNumber,@Param("age")Short age);
+
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import xyz.telecom.corp.net.dto.CustomUserDto;
 import xyz.telecom.corp.net.security.dto.JwtDto;
 import xyz.telecom.corp.net.security.dto.LoginUser;
 import xyz.telecom.corp.net.security.dto.newUser;
@@ -77,6 +78,14 @@ public class AuthController {
             return new ResponseEntity("Ese email ya existe", HttpStatus.BAD_REQUEST);
         if(userService.existsByCode(newUser.getCode()))
             return new ResponseEntity("Ese codigo ya existe", HttpStatus.BAD_REQUEST);
+        if(newUser.getAddress()== null||newUser.getAge() == null||newUser.getCode()==null||newUser.getEmail()== null||
+        		newUser.getLogin()== null||newUser.getPassword()== null||newUser.getPhoneNumber()== null||newUser.getRoles()== null) {
+        	return new ResponseEntity("Lo sentimos, no admitimos ningun dato vacio", HttpStatus.BAD_REQUEST);
+        }
+        if(newUser.getAddress().isEmpty()||newUser.getAge()<14||newUser.getCode()<=0||newUser.getEmail().isEmpty()||
+        		newUser.getLogin().isEmpty()||newUser.getPassword().isEmpty()||newUser.getPhoneNumber().isEmpty()||newUser.getRoles().size() <= 0) {
+        	return new ResponseEntity("Lo sentimos, no admitimos ningun dato vacio", HttpStatus.BAD_REQUEST);
+        }
         Users users =
                 new Users(newUser.getName(), newUser.getLogin(), newUser.getEmail(),newUser.getCode(),newUser.getAge(),newUser.getPhoneNumber(),newUser.getAddress(),
                         passwordEncoder.encode(newUser.getPassword()));
@@ -106,5 +115,32 @@ public class AuthController {
         
         return ResponseEntity.ok(jwtDto);
         //return ResponseEntity.ok("ok");
+    }
+    
+    @PutMapping("/updateUser")
+    public ResponseEntity<?> registerUser(@RequestBody CustomUserDto user,@PathVariable("id") Integer id, BindingResult bindingResult){
+    	
+    	Users usr = new Users(user.getId(),user.getCode(),user.getName(),user.getLogin(),user.getAge(),user.getPhoneNumber()
+        		,user.getAddress(),user.getEmail(),passwordEncoder.encode(user.getPassword()));
+    	/*
+    	 Users users =
+                 new Users(newUser.getName(), newUser.getLogin(), newUser.getEmail(),newUser.getCode(),newUser.getAge(),newUser.getPhoneNumber(),newUser.getAddress(),
+                         passwordEncoder.encode(newUser.getPassword()));
+        
+         * Id,Integer code,String name,String login,Short age,String phoneNumber
+    		,String address,String email,String password
+         * */
+        Set<Rol> roles = new HashSet<>();
+        //roles.add(rolService.getByRolNombre(RolName.ADMIN).get());
+        if(usr.getRoles().contains("admin"))roles.add(rolService.getByRolName(RolName.ADMIN).get());
+        if(usr.getRoles().contains("user"))roles.add(rolService.getByRolName(RolName.USER).get());
+        if(usr.getRoles().contains("viewer"))roles.add(rolService.getByRolName(RolName.VIEWER).get());
+        usr.setRoles(roles);
+        //userService.deleteUser(id);
+        
+        userService.updateUserInfo(usr,user.getId());
+        
+        //userService.save(users);
+        return ResponseEntity.ok("Usuario Actualizado");
     }
 }

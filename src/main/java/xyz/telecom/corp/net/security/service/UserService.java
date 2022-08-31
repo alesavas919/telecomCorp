@@ -54,6 +54,11 @@ public class UserService {
     	
     	return deleted;
     }
+    public Boolean updateUserInfo(Users user,Integer id) {
+    	userRepository.deleteById(id);
+    	userRepository.save(user);
+    	return true;
+    }
     public boolean existsByCode(Integer code) {
     	return userRepository.existsByCode(code);
     }

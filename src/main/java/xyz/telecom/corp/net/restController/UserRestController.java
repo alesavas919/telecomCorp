@@ -64,7 +64,7 @@ public class UserRestController {
 	//@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> updateUser(@RequestBody CustomUserDto user){
 		
-        if(userService.existsByUserName(user.getLogin()))
+        /*if(userService.existsByUserName(user.getLogin()))
             return new ResponseEntity("Ese nombre ya existe", HttpStatus.BAD_REQUEST);
         if(userService.existsByEmail(user.getEmail()))
             return new ResponseEntity("Ese email ya existe", HttpStatus.BAD_REQUEST);
@@ -72,7 +72,7 @@ public class UserRestController {
             return new ResponseEntity("Ese codigo ya existe", HttpStatus.BAD_REQUEST);
         if(userService.existsById(user.getId())==false)
         	return new ResponseEntity("El usuario no existe",HttpStatus.BAD_REQUEST);
-        
+        */
         Users usr = new Users(user.getId(),user.getCode(),user.getName(),user.getLogin(),user.getAge(),user.getPhoneNumber()
         		,user.getAddress(),user.getEmail(),passwordEncoder.encode(user.getPassword()));
         Set<Rol> roles = new HashSet<>();
@@ -90,11 +90,6 @@ public class UserRestController {
 	}
 
 
-	
-	@GetMapping("/roleProperties")
-	public ResponseEntity<?> roleProperties(@RequestBody Users user){
-		return ResponseEntity.ok("");
-	}
 	
 
 }
