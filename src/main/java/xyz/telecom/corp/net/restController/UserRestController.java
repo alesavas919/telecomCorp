@@ -90,7 +90,7 @@ public class UserRestController {
 	}
 
 
-	
+	//EXISTE
 	@GetMapping("/roleProperties")
 	public ResponseEntity<?> roleProperties(@RequestBody Users user){
 		return ResponseEntity.ok("");
